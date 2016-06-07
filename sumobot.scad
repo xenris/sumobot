@@ -6,6 +6,7 @@ height = 40;
 scoopSize = 20;
 scoopSharpness = 0.5; // 0 = sharp, 5 = blunt
 shellThickness = 4;
+groundClearance = 2;
 
 motorLength = 9 + 15;
 motorWidth = 12;
@@ -15,7 +16,15 @@ driveShaftWidth = 3;
 motorShaftLength = 5;
 motorShaftWidth = 1;
 
-driveShaftDistanceToWall = 2;
+wheelColor = "green";
+wheelWidth = 6.6;
+wheelBumpHeight = 2;
+wheelBumpRadius = 4; // XXX Guess.
+wheelRadius = 16;
+wheelMargin = 1;
+wheelX = scoopSize / 2;
+wheelY = width / 2 - shellThickness - wheelWidth / 2 - wheelMargin;
+wheelZ = -(height / 2 - wheelRadius + groundClearance);
 
 crossSection = false;
 
@@ -35,14 +44,14 @@ difference() {
 module model() {
     union() {
         color(botColor) {
-            shell();
+            body();
             ramp();
         }
 
         color(motorColor) {
-            mx = scoopSize / 2;
-            my = width / 2 - shellThickness - motorLength / 2 - driveShaftLength - driveShaftDistanceToWall;
-            mz = -(height / 2 - motorHeight / 2 - shellThickness);
+            mx = wheelX;
+            my = wheelY - motorLength / 2 - driveShaftLength + wheelWidth / 2;
+            mz = wheelZ;
             translate([mx, -my, mz]) {
                 motor();
             }
@@ -50,6 +59,59 @@ module model() {
                 rotate([180, 0, 0]) {
                     motor();
                 }
+            }
+        }
+
+        color(wheelColor) {
+            wheels();
+        }
+    }
+}
+
+module body() {
+    difference() {
+        shell();
+        wheelSlots();
+    }
+}
+
+module wheelSlots() {
+    sxz = (2 * wheelMargin / wheelRadius) + 1;
+    sy = (2 * wheelMargin / wheelWidth) + 1;
+
+    translate([wheelX, wheelY, wheelZ]) {
+        scale([sxz, sy, sxz]) {
+            wheel();
+        }
+    }
+
+    mirror([0, 1, 0]) {
+        translate([wheelX, wheelY, wheelZ]) {
+            scale([sxz, sy, sxz]) {
+                wheel();
+            }
+        }
+    }
+}
+
+module wheels() {
+    translate([wheelX, wheelY, wheelZ]) {
+        wheel();
+    }
+
+    mirror([0, 1, 0]) {
+        translate([wheelX, wheelY, wheelZ]) {
+            wheel();
+        }
+    }
+}
+
+module wheel() {
+    rotate([90, 0, 0]) {
+        union() {
+            cylinder(h = wheelWidth, r = wheelRadius, $fn = 50, center = true);
+            translate([0, 0, wheelBumpHeight / 2]) {
+                cylinder(h = wheelWidth + wheelBumpHeight, r = wheelBumpRadius, $fn = 50, center = true);
             }
         }
     }
