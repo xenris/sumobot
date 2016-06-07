@@ -52,11 +52,11 @@ module model() {
             mx = wheelX;
             my = wheelY - motorLength / 2 - driveShaftLength + wheelWidth / 2;
             mz = wheelZ;
-            translate([mx, -my, mz]) {
+            translate([mx, my, mz]) {
                 motor();
             }
-            translate([mx, my, mz]) {
-                rotate([180, 0, 0]) {
+            mirror([0, 1, 0]) {
+                translate([mx, my, mz]) {
                     motor();
                 }
             }
