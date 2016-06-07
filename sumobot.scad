@@ -7,7 +7,7 @@ groundClearance = 2;
 scoopSize = 20;
 scoopSharpness = 0.5; // 0 = sharp, 5 = blunt
 
-shellColor = "red";
+bodyColor = "red";
 shellThickness = 4;
 
 motorColor = "yellow";
@@ -47,35 +47,23 @@ difference() {
 
 module model() {
     union() {
-        color(shellColor) {
-            body();
-            ramp();
-        }
+        body();
 
-        color(motorColor) {
-            mx = wheelX;
-            my = wheelY - motorLength / 2 - driveShaftLength + wheelWidth / 2;
-            mz = wheelZ;
-            translate([mx, my, mz]) {
-                motor();
-            }
-            mirror([0, 1, 0]) {
-                translate([mx, my, mz]) {
-                    motor();
-                }
-            }
-        }
+        motors();
 
-        color(wheelColor) {
-            wheels();
-        }
+        wheels();
     }
 }
 
 module body() {
-    difference() {
-        shell();
-        wheelSlots();
+    color(bodyColor) {
+        union() {
+            difference() {
+                shell();
+                wheelSlots();
+            }
+            ramp();
+        }
     }
 }
 
@@ -99,13 +87,15 @@ module wheelSlots() {
 }
 
 module wheels() {
-    translate([wheelX, wheelY, wheelZ]) {
-        wheel();
-    }
-
-    mirror([0, 1, 0]) {
+    color(wheelColor) {
         translate([wheelX, wheelY, wheelZ]) {
             wheel();
+        }
+
+        mirror([0, 1, 0]) {
+            translate([wheelX, wheelY, wheelZ]) {
+                wheel();
+            }
         }
     }
 }
@@ -161,6 +151,22 @@ module ramp() {
                 rotate([90, 0, 0]) {
                     cylinder(h = botWidth + 1, r = scoopRadius, center = true, $fn = 400);
                 }
+            }
+        }
+    }
+}
+
+module motors() {
+    color(motorColor) {
+        mx = wheelX;
+        my = wheelY - motorLength / 2 - driveShaftLength + wheelWidth / 2;
+        mz = wheelZ;
+        translate([mx, -my, mz]) {
+            motor();
+        }
+        mirror([0, 1, 0]) {
+            translate([mx, -my, mz]) {
+                motor();
             }
         }
     }
