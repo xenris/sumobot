@@ -1,20 +1,23 @@
-botColor = "red";
-motorColor = "yellow";
-length = 100;
-width = 100;
-height = 40;
-scoopSize = 20;
-scoopSharpness = 0.5; // 0 = sharp, 5 = blunt
-shellThickness = 4;
+botLength = 100;
+botWidth = 100;
+botHeight = 40;
+
 groundClearance = 2;
 
+scoopSize = 20;
+scoopSharpness = 0.5; // 0 = sharp, 5 = blunt
+
+shellColor = "red";
+shellThickness = 4;
+
+motorColor = "yellow";
 motorLength = 9 + 15;
 motorWidth = 12;
 motorHeight = 10;
-driveShaftLength = 10;
-driveShaftWidth = 3;
 motorShaftLength = 5;
 motorShaftWidth = 1;
+driveShaftLength = 10;
+driveShaftWidth = 3;
 
 wheelColor = "green";
 wheelWidth = 6.6;
@@ -22,14 +25,15 @@ wheelBumpHeight = 2;
 wheelBumpRadius = 4; // XXX Guess.
 wheelRadius = 16;
 wheelMargin = 1;
-wheelX = scoopSize / 2;
-wheelY = width / 2 - shellThickness - wheelWidth / 2 - wheelMargin;
-wheelZ = -(height / 2 - wheelRadius + groundClearance);
 
 crossSection = false;
 
 scoopRadius = scoopSize * (scoopSharpness + 1);
-shellLength = length - scoopSize;
+shellLength = botLength - scoopSize;
+
+wheelX = scoopSize / 2;
+wheelY = botWidth / 2 - shellThickness - wheelWidth / 2 - wheelMargin;
+wheelZ = -(botHeight / 2 - wheelRadius + groundClearance);
 
 difference() {
     model();
@@ -43,7 +47,7 @@ difference() {
 
 module model() {
     union() {
-        color(botColor) {
+        color(shellColor) {
             body();
             ramp();
         }
@@ -120,10 +124,10 @@ module wheel() {
 module shell() {
     translate([scoopSize / 2, 0, 0]) {
         difference() {
-            cube(size = [shellLength, width, height], center = true);
+            cube(size = [shellLength, botWidth, botHeight], center = true);
             translate([0, 0, shellThickness]) {
                 t2 = shellThickness * 2;
-                cube(size = [shellLength - t2, width - t2, height], center = true);
+                cube(size = [shellLength - t2, botWidth - t2, botHeight], center = true);
             }
         }
     }
@@ -146,16 +150,16 @@ module ramp() {
     z = z3 + sqrt(rr - pow(q/2, 2)) * (x1-x2) / q;
     x = x3 + sqrt(rr - pow(q/2, 2)) * (z2-z1) / q;
 
-    sx = -(length / 2 - scoopSize / 2);
-    sz = -(height / 2 - scoopSize / 2);
+    sx = -(botLength / 2 - scoopSize / 2);
+    sz = -(botHeight / 2 - scoopSize / 2);
 
     translate([sx, 0, sz]) {
         difference() {
-            cube(size = [scoopSize, width, scoopSize], center = true);
+            cube(size = [scoopSize, botWidth, scoopSize], center = true);
 
             translate([x, 0, z]) {
                 rotate([90, 0, 0]) {
-                    cylinder(h = width + 1, r = scoopRadius, center = true, $fn = 400);
+                    cylinder(h = botWidth + 1, r = scoopRadius, center = true, $fn = 400);
                 }
             }
         }
