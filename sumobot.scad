@@ -1,4 +1,5 @@
 botColor = "red";
+motorColor = "yellow";
 length = 100;
 width = 100;
 height = 40;
@@ -6,13 +7,51 @@ scoopSize = 20;
 scoopSharpness = 0.5; // 0 = sharp, 5 = blunt
 shellThickness = 4;
 
+motorLength = 9 + 15;
+motorWidth = 12;
+motorHeight = 10;
+driveShaftLength = 10;
+driveShaftWidth = 3;
+motorShaftLength = 5;
+motorShaftWidth = 1;
+
+driveShaftDistanceToWall = 2;
+
+crossSection = false;
+
 scoopRadius = scoopSize * (scoopSharpness + 1);
 shellLength = length - scoopSize;
 
-color(botColor) {
+difference() {
+    model();
+
+    if(crossSection) {
+        translate([0, -500, 0]) {
+            cube(size = [1000, 1000, 1000], center = true);
+        }
+    }
+}
+
+module model() {
     union() {
-        shell();
-        ramp();
+        color(botColor) {
+            shell();
+            ramp();
+        }
+
+        color(motorColor) {
+            mx = scoopSize / 2;
+            my = width / 2 - shellThickness - motorLength / 2 - driveShaftLength - driveShaftDistanceToWall;
+            mz = -(height / 2 - motorHeight / 2 - shellThickness);
+            translate([mx, -my, mz]) {
+                motor();
+            }
+            translate([mx, my, mz]) {
+                rotate([180, 0, 0]) {
+                    motor();
+                }
+            }
+        }
     }
 }
 
@@ -56,6 +95,24 @@ module ramp() {
                 rotate([90, 0, 0]) {
                     cylinder(h = width + 1, r = scoopRadius, center = true, $fn = 400);
                 }
+            }
+        }
+    }
+}
+
+module motor() {
+    union() {
+        cube(size = [motorWidth, motorLength, motorHeight], center = true);
+        sy = -(motorLength / 2 + driveShaftLength / 2);
+        translate([0, sy, 0]) {
+            rotate([90, 0, 0]) {
+                cylinder(h = driveShaftLength, d = driveShaftWidth, $fn = 10, center = true);
+            }
+        }
+        msy = motorLength / 2 + motorShaftLength / 2;
+        translate([0, msy, 0]) {
+            rotate([90, 0, 0]) {
+                cylinder(h = motorShaftLength, d = motorShaftWidth, $fn = 10, center = true);
             }
         }
     }
