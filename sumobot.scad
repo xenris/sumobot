@@ -54,6 +54,27 @@ scoopX = -(botLength / 2 - scoopSize / 2);
 scoopY = 0;
 scoopZ = -(botHeight / 2 - scoopSize / 2);
 
+motorX = wheelX;
+motorY = wheelY - motorLength / 2 - driveShaftLength + wheelWidth / 2;
+motorZ = wheelZ;
+
+motorBracketX = motorX;
+motorBracketY = motorY + motorLength / 2 - bracketLength / 2;
+motorBracketZ = motorZ - motorHeight / 2 + bracketHeight / 2;
+
+motorMountWidth = bracketWidth + 2 * bracketTabLength;
+motorMountHeight = wheelRadius - groundClearance - shellThickness - motorHeight / 2;
+motorMountLength = bracketLength;
+
+motorMountX = motorBracketX;
+motorMountY = motorBracketY;
+motorMountZ = -(botHeight / 2 - shellThickness - motorMountHeight / 2);
+
+motorMountHoleX = motorBracketX;
+motorMountHoleY = motorBracketY + bracketLength / 2 - bracketTabWidth / 2;
+motorMountHoleZ = -(botHeight / 2 - shellThickness);
+motorMountHoleXOffset = 18 / 2;
+
 difference() {
     model();
 
@@ -70,6 +91,8 @@ module model() {
 
         motors();
 
+        motorBrackets();
+
         wheels();
     }
 }
@@ -84,8 +107,26 @@ module body() {
                 translate([scoopX, scoopY, scoopZ]) {
                     scoop();
                 }
+                translate([motorMountX, motorMountY, motorMountZ]) {
+                    motorMount();
+                }
+                translate([motorMountX, -motorMountY, motorMountZ]) {
+                    motorMount();
+                }
             }
             wheelSlots();
+            translate([motorMountHoleX + motorMountHoleXOffset, motorMountHoleY, motorMountHoleZ]) {
+                motorMountHoles();
+            }
+            translate([motorMountHoleX - motorMountHoleXOffset, motorMountHoleY, motorMountHoleZ]) {
+                motorMountHoles();
+            }
+            translate([motorMountHoleX + motorMountHoleXOffset, -motorMountHoleY, motorMountHoleZ]) {
+                motorMountHoles();
+            }
+            translate([motorMountHoleX - motorMountHoleXOffset, -motorMountHoleY, motorMountHoleZ]) {
+                motorMountHoles();
+            }
         }
     }
 }
@@ -173,28 +214,15 @@ module scoop() {
 }
 
 module motors() {
-    mx = wheelX;
-    my = wheelY - motorLength / 2 - driveShaftLength + wheelWidth / 2;
-    mz = wheelZ;
-    translate([mx, my, mz]) {
+    translate([motorX, motorY, motorZ]) {
         color(motorColor) {
             motor();
         }
-        translate([0, motorLength / 2 - bracketLength / 2, -motorHeight / 2 + bracketHeight / 2]) {
-            color(bracketColor) {
-                motorBracket();
-            }
-        }
     }
     mirror([0, 1, 0]) {
-        translate([mx, my, mz]) {
+        translate([motorX, motorY, motorZ]) {
             color(motorColor) {
                 motor();
-            }
-            translate([0, motorLength / 2 - bracketLength / 2, -motorHeight / 2 + bracketHeight / 2]) {
-                color(bracketColor) {
-                    motorBracket();
-                }
             }
         }
     }
@@ -232,6 +260,22 @@ module motor() {
     }
 }
 
+module motorBrackets() {
+    translate([motorBracketX, motorBracketY, motorBracketZ]) {
+        color(bracketColor) {
+            motorBracket();
+        }
+    }
+
+    mirror([0, 1, 0]) {
+        translate([motorBracketX, motorBracketY, motorBracketZ]) {
+            color(bracketColor) {
+                motorBracket();
+            }
+        }
+    }
+}
+
 module motorBracket() {
     difference() {
         union() {
@@ -249,13 +293,21 @@ module motorBracket() {
             rotate([0, 0, 90]) {
                 cylinder(h = bracketTabHeight, r = bracketTabWidth / 4, $fn = 6, center = true);
             }
-            cylinder(h = bracketTabHeight * 4, r = 2.2 / 4, $fn = 20, center = true);
+            cylinder(h = bracketTabHeight * 4, d = 2.3, $fn = 20, center = true);
         }
         translate([-18 / 2, bracketTabY, bracketTabZ + bracketTabHeight / 2]) {
             rotate([0, 0, 90]) {
                 cylinder(h = bracketTabHeight, r = bracketTabWidth / 4, $fn = 6, center = true);
             }
-            cylinder(h = bracketTabHeight * 4, r = 2.2 / 4, $fn = 20, center = true);
+            cylinder(h = bracketTabHeight * 4, d = 2.3, $fn = 20, center = true);
         }
     }
+}
+
+module motorMount() {
+    cube(size = [motorMountWidth, motorMountLength, motorMountHeight], center = true);
+}
+
+module motorMountHoles() {
+    cylinder(h = shellThickness + motorMountHeight + 10, d = 2.3, $fn = 20, center = true);
 }
