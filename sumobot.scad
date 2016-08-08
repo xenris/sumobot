@@ -75,6 +75,14 @@ motorMountHoleY = motorBracketY + bracketLength / 2 - bracketTabWidth / 2;
 motorMountHoleZ = -(botHeight / 2 - shellThickness);
 motorMountHoleXOffset = 18 / 2;
 
+processorColor = "blue";
+processorWidth = 17.8;
+processorLength = 30.5;
+processorHeight = 3; // XXX Guess.
+processorX = botLength / 2 - processorHeight / 2 - shellThickness - 1;
+processorY = 0;
+processorZ = 0;
+
 difference() {
     model();
 
@@ -94,6 +102,8 @@ module model() {
         motorBrackets();
 
         wheels();
+
+        processor();
     }
 }
 
@@ -310,4 +320,14 @@ module motorMount() {
 
 module motorMountHoles() {
     cylinder(h = shellThickness + motorMountHeight + 10, d = 2.3, $fn = 20, center = true);
+}
+
+module processor() {
+    color(processorColor) {
+        translate([processorX, processorY, processorZ]) {
+            rotate([0, 90, 0]) {
+                cube(size = [processorWidth, processorLength, processorHeight], center = true);
+            }
+        }
+    }
 }
